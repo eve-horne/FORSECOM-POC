@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -28,18 +29,11 @@ namespace ForsecomInterops
             webBrowser1.IsWebBrowserContextMenuEnabled = false;
             webBrowser1.WebBrowserShortcutsEnabled = false;
             webBrowser1.ObjectForScripting = SingletonObjectForScripting.Instance;
-            // Uncomment the following line when you are finished debugging.
             //webBrowser1.ScriptErrorsSuppressed = true;
 
             // TODO: Mark wanted us to test this spike with Vue.JS if possible. That means we should probably set up a separate html file to serve as the DocumentText
             // so that we can try integrating Vuex into all of this.
-            webBrowser1.DocumentText =
-                "<html><head><script>" +
-                "function test(message) { alert(message); }" +
-                "</script></head><body><button " +
-                "onclick=\"window.external.SendInfoToWindows('Some JS message')\">" +
-                "This is a JS button in the webpage!</button>" +
-                "</body></html>";
+            webBrowser1.DocumentText = File.ReadAllText("Webpage.html");
         }
 
         /// <summary>
