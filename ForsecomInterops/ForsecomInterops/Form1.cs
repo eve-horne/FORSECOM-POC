@@ -8,6 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Diagnostics;
 
 namespace ForsecomInterops
 {
@@ -17,7 +18,7 @@ namespace ForsecomInterops
         {
             InitializeComponent();
         }
-
+        public DateTime lastActive;
         /// <summary>
         /// Load form event handler. Based on sample code from https://docs.microsoft.com/en-us/dotnet/api/system.windows.forms.webbrowser.objectforscripting?view=netcore-3.1
         /// </summary>
@@ -26,7 +27,7 @@ namespace ForsecomInterops
         private void Form1_Load(object sender, EventArgs e)
         {
             webBrowser1.AllowWebBrowserDrop = false;
-            webBrowser1.IsWebBrowserContextMenuEnabled = false;
+            webBrowser1.IsWebBrowserContextMenuEnabled = true;
             webBrowser1.WebBrowserShortcutsEnabled = false;
             webBrowser1.ObjectForScripting = SingletonObjectForScripting.Instance;
             //webBrowser1.ScriptErrorsSuppressed = true;
@@ -45,12 +46,19 @@ namespace ForsecomInterops
         /// <param name="e"></param>
         private void button1_Click(object sender, EventArgs e)
         {
-            webBrowser1.Document.InvokeScript("test",
-            new String[] { "This is text in C# that has been sent to the web browser and is now being shown with a JS alert!" });
+            Debug.WriteLine(webBrowser1.Document.InvokeScript("test",
+            new String[] { "This is text in C# that has been sent to the web browser and is now being shown with a JS alert!" }));
             // TODO: check if InvokeScript will pass back return values of JS functions to the C#-side code?
             // If this can't pass back return values, then we'll have to be clever about how the webpage would tell
             // TOCS the current login status. Perhaps it would then immediately do a "window.external.SomeC#Function(The necessary information)"
             // to initiate a separate call back from the webpage to the C#-side code.
         }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            lastActive = DateTime.Now;
+            label2.Text = lastActive.ToString();
+        }
+
     }
 }

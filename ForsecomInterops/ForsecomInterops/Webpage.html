@@ -2,26 +2,49 @@
 
 <html lang="en" xmlns="http://www.w3.org/1999/xhtml">
 <head>
-   <meta http-equiv="X-UA-Compatible" content="IE=11" />
+    <meta http-equiv="X-UA-Compatible" content="IE=11" />
     <title></title>
     <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
 </head>
 <body>
     <script>
-        function test(message) { alert(message); }
+      function test(message) { return app.test(message) }
+    </script>
+    <div id="app">
+        <button v-on:click="checkDate">Check Date</button>
+
+
+        <button v-on:click="phoneHome">
+            This is a JS button in the webpage!
+        </button> <br />
+
+        Last time active: ({{ lastDate }}) <br />
+        Time since last active: {{ elapsedTime }} <br />
+        {{ message }}
+    </div>
+    <script>
 
         var app = new Vue({
             el: '#app',
             data: {
-            message: 'Hello Vue!'
+                message: 'If you see me, vue is working!',
+                dateCheck: false,
+                lastDate: "none",
+                elapsedTime: "none"
+            },
+            methods: {
+                updateDateCheck: function (status) {
+                    this.dateCheck = status;
+                },
+                checkDate: function () {
+                    window.external.requestLastActiveTime()
+                },
+                test: function (message) { alert(message); return "This is some return data originating from the JS side of things"; },
+                phoneHome: function () {
+                    window.external.SendInfoToWindows('Some JS message')
+                }
             }
         })
     </script>
-    <button onclick="window.external.SendInfoToWindows('Some JS message')">
-        This is a JS button in the webpage!
-    </button>
-    <div id="app">
-        {{ message }}
-    </div>
 </body>
 </html>

@@ -49,5 +49,9 @@ namespace ForsecomInterops
             // to the JS? Else, we'll probably need to do webBrowser1.Document.InvokeScript(the necessary information) inside of this function
             // before returning.
         }
+        public void requestLastActiveTime()
+        {
+
+        }
     }
 }
