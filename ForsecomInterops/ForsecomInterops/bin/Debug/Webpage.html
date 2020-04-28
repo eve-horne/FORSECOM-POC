@@ -6,6 +6,9 @@
     <title></title>
     <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
     <script src="https://unpkg.com/vuex"></script>
+    <!-- Script for polyfilling Promises on IE9 and 10 -->
+    <!-- see: https://github.com/vuejs-templates/webpack/issues/474 -->
+    <script src='https://cdn.polyfill.io/v2/polyfill.min.js'></script>
 </head>
 <body>
     <div id="app">
@@ -17,36 +20,79 @@
         </button> <br />
 
         Last time active: ({{ lastDate }}) <br />
-        Time since last active: {{ elapsedTime }} <br />
+        Time since last active: {{ timeElapsed }} minutes <br />
         {{ message }}
     </div>
     <script>
         function test(message) { return app.test(message) }
         function setDate(date) { return app.setDate(date) }
+
+        Vue.use(Vuex)
+        const store = new Vuex.Store({
+            // Global state store
+            state: {
+                lastDate: null,
+                elapsedTime: null
+            },
+            // Mutations update the state
+            // All-caps is convention for the names of mutations, actions, and getters
+            mutations: {
+                UPDATE_LAST_DATE: function (state, date) {
+                    state.lastDate = date;
+                },
+                UPDATE_ELAPSED_TIME: function (state) {
+                    state.elapsedTime = ((Date.now() - Date.parse(state.lastDate))/60000).toFixed(2);
+                }
+            }
+        })
+
         var app = new Vue({
             el: '#app',
+            // The store has to be injected into the Vue instance
+            store: store,
             data: {
                 message: 'If you see me, vue is working!',
                 dateCheck: false,
-                lastDate: "none",
-                elapsedTime: "none"
+            },
+            computed: {
+                // References the lastDate in the global store
+                // These are "computed" properties because they rely on the store's state
+                lastDate: function () {
+                    return this.$store.state.lastDate;
+                },
+                timeElapsed: function () {
+                    return this.$store.state.elapsedTime;
+                }
+                // Declaring these separately is a pain, but for some reason I can't get mapState() (Vue's suggested solution) to work in our setup
             },
             methods: {
                 updateDateCheck: function (status) {
                     this.dateCheck = status;
                 },
                 checkDate: function () {
-                    window.external.requestLastActiveTime()
+                    window.external.requestLastActiveTime();
                 },
                 setDate: function (date) {
-                    this.lastDate = date;
+                    // Updates the lastDate value in the global store
+                    this.$store.commit('UPDATE_LAST_DATE', date);
                 },
                 test: function (message) { alert(message); return "This is some return data originating from the JS side of things"; },
                 phoneHome: function () {
-                    window.external.SendInfoToWindows('Some JS message')
+                    window.external.SendInfoToWindows('Some JS message');
+                },
+                updateTimeElapsed: function () {
+                    this.$store.commit('UPDATE_ELAPSED_TIME');
                 }
+            },
+            // These two ensure that the timeElapsed is updated regularly (I believe Vue can't tell that Date.now() changes every second, so we have to manually tell it to update)
+            mounted: function () {
+                this.$options.interval = setInterval(this.updateTimeElapsed, 500);
+            },
+            beforeDestroy: function () {
+                clearInterval(this.$options.interval);
             }
         })
+
     </script>
 </body>
 </html>
