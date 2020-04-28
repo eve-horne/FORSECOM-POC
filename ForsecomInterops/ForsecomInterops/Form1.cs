@@ -19,7 +19,7 @@ namespace ForsecomInterops
             InitializeComponent();
         }
         public static DateTime lastActive;
-        private SingletonObjectForScripting objectForScripting;
+        private ObjectForScripting objectForScripting;
         /// <summary>
         /// Load form event handler. Based on sample code from https://docs.microsoft.com/en-us/dotnet/api/system.windows.forms.webbrowser.objectforscripting?view=netcore-3.1
         /// </summary>
@@ -27,7 +27,7 @@ namespace ForsecomInterops
         /// <param name="e"></param>
         private void Form1_Load(object sender, EventArgs e)
         {
-            objectForScripting = new SingletonObjectForScripting(webBrowser1);
+            objectForScripting = new ObjectForScripting(webBrowser1);
             webBrowser1.AllowWebBrowserDrop = false;
             webBrowser1.IsWebBrowserContextMenuEnabled = true;
             webBrowser1.WebBrowserShortcutsEnabled = false;

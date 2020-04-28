@@ -8,12 +8,12 @@ namespace ForsecomInterops
     /// When we actually use this code as reference, this will probably be called something like "ForseComInterop.cs"
     /// </summary>
     [System.Runtime.InteropServices.ComVisible(true)] // This attribute is necessary so that Form1's Webbrowser can "see" this object
-    public class SingletonObjectForScripting
+    public class ObjectForScripting
     {
         /// <summary>
         /// Private constructor so nobody can call it but the class itself
         /// </summary>
-        public SingletonObjectForScripting(WebBrowser browser) {
+        public ObjectForScripting(WebBrowser browser) {
            webBrowser = browser;
 
         }
