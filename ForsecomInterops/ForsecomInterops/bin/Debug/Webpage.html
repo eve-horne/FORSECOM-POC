@@ -7,9 +7,6 @@
     <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
 </head>
 <body>
-    <script>
-      function test(message) { return app.test(message) }
-    </script>
     <div id="app">
         <button v-on:click="checkDate">Check Date</button>
 
@@ -23,7 +20,8 @@
         {{ message }}
     </div>
     <script>
-
+        function test(message) { return app.test(message) }
+        function setDate(date) { return app.setDate(date) }
         var app = new Vue({
             el: '#app',
             data: {
@@ -37,7 +35,10 @@
                     this.dateCheck = status;
                 },
                 checkDate: function () {
-                    console.log("BEANS AND RICE");
+                    window.external.requestLastActiveTime()
+                },
+                setDate: function (date) {
+                    this.lastDate = date;
                 },
                 test: function (message) { alert(message); return "This is some return data originating from the JS side of things"; },
                 phoneHome: function () {

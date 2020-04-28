@@ -18,7 +18,8 @@ namespace ForsecomInterops
         {
             InitializeComponent();
         }
-        public DateTime lastActive;
+        public static DateTime lastActive;
+        private SingletonObjectForScripting objectForScripting;
         /// <summary>
         /// Load form event handler. Based on sample code from https://docs.microsoft.com/en-us/dotnet/api/system.windows.forms.webbrowser.objectforscripting?view=netcore-3.1
         /// </summary>
@@ -26,10 +27,11 @@ namespace ForsecomInterops
         /// <param name="e"></param>
         private void Form1_Load(object sender, EventArgs e)
         {
+            objectForScripting = new SingletonObjectForScripting(webBrowser1);
             webBrowser1.AllowWebBrowserDrop = false;
             webBrowser1.IsWebBrowserContextMenuEnabled = true;
             webBrowser1.WebBrowserShortcutsEnabled = false;
-            webBrowser1.ObjectForScripting = SingletonObjectForScripting.Instance;
+            webBrowser1.ObjectForScripting = this.objectForScripting;
             //webBrowser1.ScriptErrorsSuppressed = true;
 
             // TODO: Mark wanted us to test this spike with Vue.JS if possible. That means we should probably set up a separate html file to serve as the DocumentText
@@ -58,6 +60,7 @@ namespace ForsecomInterops
         {
             lastActive = DateTime.Now;
             label2.Text = lastActive.ToString();
+            this.objectForScripting.lastActive = lastActive;
         }
 
     }

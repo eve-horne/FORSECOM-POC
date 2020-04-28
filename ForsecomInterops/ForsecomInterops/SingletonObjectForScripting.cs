@@ -13,28 +13,12 @@ namespace ForsecomInterops
         /// <summary>
         /// Private constructor so nobody can call it but the class itself
         /// </summary>
-        private SingletonObjectForScripting() {}
+        public SingletonObjectForScripting(WebBrowser browser) {
+           webBrowser = browser;
 
-        /// <summary>
-        /// The only instance of this class we care about: the all important singleton
-        /// </summary>
-        private static SingletonObjectForScripting m_instance;
-
-        /// <summary>
-        /// Public-facing property that exposes the m_instance field. Should probably only be used by Form1 to set the Webbrowser.Objectforscripting.
-        /// </summary>
-        public static SingletonObjectForScripting Instance
-        {
-            get
-            {
-                if (m_instance == null)
-                {
-                    m_instance = new SingletonObjectForScripting();
-                }
-                return m_instance;
-            }
         }
-
+        private WebBrowser webBrowser;
+        public DateTime lastActive;
         /// <summary>
         /// This is an example of the webpage pinging functions within C#-side. Here, clicking on a JS button inside of the webpage
         /// calls the SendInfoToWindows() function defined below, and causes a Windows alert to pop up.
@@ -51,7 +35,7 @@ namespace ForsecomInterops
         }
         public void requestLastActiveTime()
         {
-
+            webBrowser.Document.InvokeScript("setDate", new String[] { lastActive.ToString() });
         }
     }
 }
