@@ -23,8 +23,10 @@
         {{ message }}
     </div>
     <script>
+        // Workaround to expose Vue's methods to the C# InvokeScript() method.
         function test(message) { return app.test(message) }
         function setDate(date) { return app.setDate(date) }
+        function getLoginStatus() { return app.getLoginStatus() }
 
         Vue.use(Vuex)
         const store = new Vuex.Store({
@@ -49,9 +51,10 @@
             el: '#app',
             // The store has to be injected into the Vue instance
             store: store,
+            // Component-specific data
             data: {
                 message: 'If you see me, vue is working!',
-                dateCheck: false,
+                dateCheck: false, // I wasn't really sure what this flag was for so I left it local
             },
             computed: {
                 // References the lastDate in the global store
@@ -82,6 +85,9 @@
                 },
                 updateTimeElapsed: function () {
                     this.$store.commit('UPDATE_ELAPSED_TIME');
+                },
+                getLoginStatus: function () {
+                    return (this.$store.state.timeElapsed > 0.2) ? "inactive" : "active";
                 }
             },
             // These two intervals on mounted() and beforeDestroy() ensure that the global timeElapsed is updated regularly - normally, Vue reactively updates fields as 

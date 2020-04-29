@@ -23,8 +23,10 @@
         {{ message }}
     </div>
     <script>
+        // Workaround to expose Vue's methods to the C# InvokeScript() method.
         function test(message) { return app.test(message) }
         function setDate(date) { return app.setDate(date) }
+        function getLoginStatus() { return app.getLoginStatus() }
 
         Vue.use(Vuex)
         const store = new Vuex.Store({
@@ -83,6 +85,9 @@
                 },
                 updateTimeElapsed: function () {
                     this.$store.commit('UPDATE_ELAPSED_TIME');
+                },
+                getLoginStatus: function () {
+                    return (this.$store.state.timeElapsed > 0.2) ? "inactive" : "active";
                 }
             },
             // These two intervals on mounted() and beforeDestroy() ensure that the global timeElapsed is updated regularly - normally, Vue reactively updates fields as 

@@ -19,6 +19,7 @@ namespace ForsecomInterops
         }
         private WebBrowser webBrowser;
         public DateTime lastActive;
+
         /// <summary>
         /// This is an example of the webpage pinging functions within C#-side. Here, clicking on a JS button inside of the webpage
         /// calls the SendInfoToWindows() function defined below, and causes a Windows alert to pop up.
@@ -29,9 +30,6 @@ namespace ForsecomInterops
         public void SendInfoToWindows(String message)
         {
             MessageBox.Show("This is a Windows alert! The webpage sent me this: " + message, "Windows alert!");
-            // Here, the same question applies as asked in Form1.cs - do return values of this function get sent back
-            // to the JS? Else, we'll probably need to do webBrowser1.Document.InvokeScript(the necessary information) inside of this function
-            // before returning.
         }
         public void requestLastActiveTime()
         {

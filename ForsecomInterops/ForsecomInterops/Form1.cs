@@ -20,6 +20,7 @@ namespace ForsecomInterops
         }
         public static DateTime lastActive;
         private ObjectForScripting objectForScripting;
+
         /// <summary>
         /// Load form event handler. Based on sample code from https://docs.microsoft.com/en-us/dotnet/api/system.windows.forms.webbrowser.objectforscripting?view=netcore-3.1
         /// </summary>
@@ -34,8 +35,7 @@ namespace ForsecomInterops
             webBrowser1.ObjectForScripting = this.objectForScripting;
             //webBrowser1.ScriptErrorsSuppressed = true;
 
-            // TODO: Mark wanted us to test this spike with Vue.JS if possible. That means we should probably set up a separate html file to serve as the DocumentText
-            // so that we can try integrating Vuex into all of this.
+            // Only necessary because we can't .Navigate() to a static html file
             webBrowser1.DocumentText = File.ReadAllText("Webpage.html");
         }
 
@@ -50,10 +50,6 @@ namespace ForsecomInterops
         {
             Debug.WriteLine(webBrowser1.Document.InvokeScript("test",
             new String[] { "This is text in C# that has been sent to the web browser and is now being shown with a JS alert!" }));
-            // TODO: check if InvokeScript will pass back return values of JS functions to the C#-side code?
-            // If this can't pass back return values, then we'll have to be clever about how the webpage would tell
-            // TOCS the current login status. Perhaps it would then immediately do a "window.external.SomeC#Function(The necessary information)"
-            // to initiate a separate call back from the webpage to the C#-side code.
         }
 
         private void button2_Click(object sender, EventArgs e)
@@ -63,5 +59,10 @@ namespace ForsecomInterops
             this.objectForScripting.lastActive = lastActive;
         }
 
+        private void button3_Click(object sender, EventArgs e)
+        {
+            label3.Text = "Status: " + (String)webBrowser1.Document.InvokeScript("getLoginStatus");
+
+        }
     }
 }
