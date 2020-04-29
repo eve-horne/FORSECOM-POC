@@ -9,24 +9,39 @@
     <!-- Script for polyfilling Promises on IE9 and 10 -->
     <!-- see: https://github.com/vuejs-templates/webpack/issues/474 -->
     <script src='https://cdn.polyfill.io/v2/polyfill.min.js'></script>
+
+    <style>
+        th, td {
+            border: 1px solid black;
+            text-align: left;
+            padding: 0px;
+        }
+        table {
+            border-spacing: 5px;
+            border-collapse: collapse;
+        }
+    </style>
 </head>
 <body>
     <div id="app">
-        <button v-on:click="checkDate">Check Date</button>
+        <button v-on:click="checkDate">Pull "Last Active Time" from C#</button>
 
-        <button v-on:click="phoneHome">
+        <button v-on:click="phoneHome" style="float: right;">
             This is a JS button in the webpage!
         </button> <br />
-
-        Last time active: ({{ lastDate }}) <br />
-        Time since last active: {{ timeElapsed }} minutes <br />
         {{ message }}
+        <h3>Vuex state:</h3>
+        <table>
+            <tr><th>Last time active:</th><td>{{ lastDate }}</td></tr>
+            <tr><th>Time since last active: </th><td>{{ timeElapsed }} minutes</td></tr>
+            <tr><th>Login status: </th><td>{{ loginStatus }}</td></tr>
+        </table>
     </div>
     <script>
         // Workaround to expose Vue's methods to the C# InvokeScript() method.
         function test(message) { return app.test(message) }
         function setDate(date) { return app.setDate(date) }
-        function getLoginStatus() { return app.getLoginStatus() }
+        function getLoginStatus() { return app.$store.getters.GET_LOGIN_STATUS }
 
         Vue.use(Vuex)
         const store = new Vuex.Store({
@@ -42,7 +57,12 @@
                     state.lastDate = date;
                 },
                 UPDATE_ELAPSED_TIME: function (state) {
-                    state.timeElapsed = ((Date.now() - Date.parse(state.lastDate))/60000).toFixed(2);
+                    state.timeElapsed = ((Date.now() - Date.parse(state.lastDate)) / 60000).toFixed(2);
+                }
+            },
+            getters: {
+                GET_LOGIN_STATUS: function (state) {
+                    return (state.timeElapsed > 0.2) ? "inactive" : "active";
                 }
             }
         })
@@ -64,9 +84,12 @@
                 },
                 timeElapsed: function () {
                     return this.$store.state.timeElapsed;
+                },
+                loginStatus: function () {
+                    return this.$store.getters.GET_LOGIN_STATUS;
                 }
-                // Declaring each global state value we need for this component separately is a pain, but for some reason 
-                // I can't get '...mapState()' (Vue's suggested solution) to work in our setup
+                // Declaring each global state value we need for this component separately is a pain, but for some reason
+                // I can't get '...mapState()' (Vue's suggested solution) to work in our setup - maybe need Babel?
             },
             methods: {
                 updateDateCheck: function (status) {
@@ -85,12 +108,9 @@
                 },
                 updateTimeElapsed: function () {
                     this.$store.commit('UPDATE_ELAPSED_TIME');
-                },
-                getLoginStatus: function () {
-                    return (this.$store.state.timeElapsed > 0.2) ? "inactive" : "active";
                 }
             },
-            // These two intervals on mounted() and beforeDestroy() ensure that the global timeElapsed is updated regularly - normally, Vue reactively updates fields as 
+            // These two intervals on mounted() and beforeDestroy() ensure that the global timeElapsed is updated regularly - normally, Vue reactively updates fields as
             // needed (and caches the last result), but in the specific case of using Date.now(), Vue can't tell that it changes every time you call it, so we have to manually tell it to update.
             // (as per here: https://medium.com/vuejs-tips/i-want-it-now-ca6c89dded6c and https://cushionapp.com/journal/reactive-time-with-vuejs)
             mounted: function () {
@@ -98,6 +118,12 @@
             },
             beforeDestroy: function () {
                 clearInterval(this.$options.interval);
+            },
+            // Watcher on loginStatus, which is sourced from the global store as a getter. Sends a ping to C# if the login status changes.
+            watch: {
+                loginStatus: function (newLoginStatus, oldLoginStatus) {
+                    window.external.SendInfoToWindows('Login status changed from ' + oldLoginStatus + ' to ' + newLoginStatus);
+                }
             }
         })
 
