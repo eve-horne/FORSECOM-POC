@@ -14,7 +14,6 @@
     <div id="app">
         <button v-on:click="checkDate">Check Date</button>
 
-
         <button v-on:click="phoneHome">
             This is a JS button in the webpage!
         </button> <br />
@@ -32,7 +31,7 @@
             // Global state store
             state: {
                 lastDate: null,
-                elapsedTime: null
+                timeElapsed: null
             },
             // Mutations update the state
             // All-caps is convention for the names of mutations, actions, and getters
@@ -41,7 +40,7 @@
                     state.lastDate = date;
                 },
                 UPDATE_ELAPSED_TIME: function (state) {
-                    state.elapsedTime = ((Date.now() - Date.parse(state.lastDate))/60000).toFixed(2);
+                    state.timeElapsed = ((Date.now() - Date.parse(state.lastDate))/60000).toFixed(2);
                 }
             }
         })
@@ -56,14 +55,15 @@
             },
             computed: {
                 // References the lastDate in the global store
-                // These are "computed" properties because they rely on the store's state
+                // These are "computed" properties and not "data" because they rely on the global store's state
                 lastDate: function () {
                     return this.$store.state.lastDate;
                 },
                 timeElapsed: function () {
-                    return this.$store.state.elapsedTime;
+                    return this.$store.state.timeElapsed;
                 }
-                // Declaring these separately is a pain, but for some reason I can't get mapState() (Vue's suggested solution) to work in our setup
+                // Declaring each global state value we need for this component separately is a pain, but for some reason 
+                // I can't get '...mapState()' (Vue's suggested solution) to work in our setup
             },
             methods: {
                 updateDateCheck: function (status) {
@@ -72,8 +72,8 @@
                 checkDate: function () {
                     window.external.requestLastActiveTime();
                 },
+                // Updates the lastDate value in the global store
                 setDate: function (date) {
-                    // Updates the lastDate value in the global store
                     this.$store.commit('UPDATE_LAST_DATE', date);
                 },
                 test: function (message) { alert(message); return "This is some return data originating from the JS side of things"; },
@@ -84,9 +84,11 @@
                     this.$store.commit('UPDATE_ELAPSED_TIME');
                 }
             },
-            // These two ensure that the timeElapsed is updated regularly (I believe Vue can't tell that Date.now() changes every second, so we have to manually tell it to update)
+            // These two intervals on mounted() and beforeDestroy() ensure that the global timeElapsed is updated regularly - normally, Vue reactively updates fields as 
+            // needed (and caches the last result), but in the specific case of using Date.now(), Vue can't tell that it changes every time you call it, so we have to manually tell it to update.
+            // (as per here: https://medium.com/vuejs-tips/i-want-it-now-ca6c89dded6c and https://cushionapp.com/journal/reactive-time-with-vuejs)
             mounted: function () {
-                this.$options.interval = setInterval(this.updateTimeElapsed, 500);
+                this.$options.interval = setInterval(this.updateTimeElapsed, 1000); // We update every second
             },
             beforeDestroy: function () {
                 clearInterval(this.$options.interval);
