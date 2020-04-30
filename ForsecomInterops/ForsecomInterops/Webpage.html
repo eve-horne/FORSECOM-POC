@@ -62,7 +62,7 @@
             },
             getters: {
                 GET_LOGIN_STATUS: function (state) {
-                    return (state.timeElapsed > 0.2) ? "inactive" : "active";
+                    return (state.timeElapsed < 0.2) ? "active" : "inactive";
                 }
             }
         })
@@ -122,7 +122,7 @@
             // Watcher on loginStatus, which is sourced from the global store as a getter. Sends a ping to C# if the login status changes.
             watch: {
                 loginStatus: function (newLoginStatus, oldLoginStatus) {
-                    window.external.SendInfoToWindows('Login status changed from ' + oldLoginStatus + ' to ' + newLoginStatus);
+                    window.external.WriteInfoToWindows('Login status changed from ' + oldLoginStatus + ' to ' + newLoginStatus);
                 }
             }
         })

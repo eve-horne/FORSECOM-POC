@@ -15,8 +15,8 @@ namespace ForsecomInterops
         /// </summary>
         public ObjectForScripting(WebBrowser browser) {
            webBrowser = browser;
-
         }
+
         private WebBrowser webBrowser;
         public DateTime lastActive;
 
@@ -30,6 +30,10 @@ namespace ForsecomInterops
         public void SendInfoToWindows(String message)
         {
             MessageBox.Show("This is a Windows alert! The webpage sent me this: " + message, "Windows alert!");
+        }
+        public void WriteInfoToWindows(String message)
+        {
+            Console.WriteLine(message);
         }
         public void requestLastActiveTime()
         {

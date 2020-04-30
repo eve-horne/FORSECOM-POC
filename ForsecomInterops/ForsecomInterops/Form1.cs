@@ -14,10 +14,39 @@ namespace ForsecomInterops
 {
     public partial class Form1 : Form
     {
-        public Form1()
+        private static Form1 instance;
+
+        private Form1()
         {
             InitializeComponent();
         }
+
+        public static Form1 Instance
+        {
+            get
+            {
+                if (instance == null || instance.IsDisposed)
+                    instance = new Form1();
+                return instance;
+            }
+        }
+
+        protected override void OnFormClosing(FormClosingEventArgs e)
+        {
+            base.OnFormClosing(e);
+
+            // Only hide the form if the user is trying to close it (or it's being programmatically closed).
+            // If the system is shutting down or its parent form is closing, we do want it to close properly.
+            if (e.CloseReason == CloseReason.UserClosing)
+            {
+                e.Cancel = true; // cancel the formclose event
+                Hide(); // hide the form
+                return;
+            }
+
+            // Else, there's something else going on and we should truly close the form
+        }
+
         public static DateTime lastActive;
         private ObjectForScripting objectForScripting;
 
