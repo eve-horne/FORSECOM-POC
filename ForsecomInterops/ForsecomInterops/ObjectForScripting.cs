@@ -9,10 +9,13 @@ namespace ForsecomInterops
     /// (Lives where we put the windows form)
     /// </summary>
     [System.Runtime.InteropServices.ComVisible(true)] // This attribute is necessary so that Form1's Webbrowser can "see" this object
-    public class ObjectForScripting // needs access to FormBase somehow
+    public class ObjectForScripting // would need access to FormBase somehow (so it can access lastActiveDate)
     {
 
         public ObjectForScripting() {}
+
+        // By having this as an interal property, we ensure that C# can set this field, but the JS can only access the UserLastActiveDate (which is Get-only)
+        // Basically, we're ensuring that only the C# can both get/set the property, and JS can only get, not set.
         internal string lastActiveDate; // this would be in FormBase as a static property
 
         // This property can be referenced by both the JS-world and the C#-world.
