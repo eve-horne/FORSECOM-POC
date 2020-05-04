@@ -132,7 +132,7 @@
             // Watcher on loginStatus, which is sourced from the global store as a getter. Sends a ping to C# if the login status changes.
             watch: {
                 loginStatus: function (newLoginStatus, oldLoginStatus) {
-                    window.external.WriteInfoToWindows('Login status changed from ' + oldLoginStatus + ' to ' + newLoginStatus); // will be step in token process
+                    window.external.WinLog('Login status changed from ' + oldLoginStatus + ' to ' + newLoginStatus); // will be step in token process
                 }
             }
         })

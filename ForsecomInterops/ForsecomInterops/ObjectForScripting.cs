@@ -37,12 +37,12 @@ namespace ForsecomInterops
         }
 
         /// <summary>
-        /// Simple test function that JS can call to ping C#
+        /// Simple logging function that JS can call to ping C#
         /// </summary>
         /// <param name="message"></param>
-        public void WriteInfoToWindows(string message)
+        public void WinLog(string message)
         {
-            Console.WriteLine(message); //#if debug - applicationlogger.log
+            Console.WriteLine(message); //#if debug - applicationlogger.log (in actual TOCS project)
         }
     }
 }
