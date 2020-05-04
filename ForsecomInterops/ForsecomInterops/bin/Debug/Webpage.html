@@ -39,9 +39,7 @@
     </div>
     <script>
         // Workaround to expose Vue's methods to the C# InvokeScript() method.
-        function test(message) { return app.test(message) }
-        function setDate(date) { return app.setDate(date) }
-        function getLoginStatus() { return app.$store.getters.GET_LOGIN_STATUS }
+        function callFunction(functionName, arg) { return app.callFunction(functionName, arg) } // a little unhappy with this implementation because it only supports 0 or 1 arguments...
 
         Vue.use(Vuex)
         const store = new Vuex.Store({
@@ -62,7 +60,7 @@
             },
             getters: {
                 GET_LOGIN_STATUS: function (state) {
-                    return (state.timeElapsed < 0.2) ? "active" : "inactive";
+                    return (state.timeElapsed < 0.2) ? "active" : "inactive"; // (Change to 15 minutes for actual implementation)
                 }
             }
         })
@@ -91,35 +89,55 @@
                 // I can't get '...mapState()' (Vue's suggested solution) to work in our setup - maybe need Babel?
             },
             methods: {
-                // Checks the last date of activity from C#-land
+                // Triggered by (future) webpage daemon: Checks the last date of activity from C#-land
                 checkDate: function () {
                     this.$store.commit('UPDATE_LAST_DATE', window.external.UserLastActiveDateTime);
                 },
-                test: function (message) { alert(message); return "This is some return data originating from the JS side of things"; },
+                // Triggered by C#: Simple test that implicitly sends info to Windows using the return functionality
+                test: function (message) {
+                    alert(message); return "This is some return data originating from the JS side of things";
+                },
+                // Triggered by webpage button: Simple test that explicitly sends something to Windows using a function
                 phoneHome: function () {
                     window.external.SendInfoToWindows('Some JS message');
                 },
+                // Triggered by webpage daemon every 1 second: Updates the last elapsed time
                 updateTimeElapsed: function () {
                     this.$store.commit('UPDATE_ELAPSED_TIME');
+                },
+                // Triggered by webpage daemon every 1 minute: Updates the last active datetime from the user
+                updateLastActiveDateTime: function () {
+                    this.$store.commit('UPDATE_LAST_DATE', window.external.UserLastActiveDateTime);
+                },
+                // Layer that exposes the internal functions of Vue to a single top-level one that C# can call (if necessary)
+                callFunction: function (functionName, arg) {
+                    switch (functionName) {
+                        case "test": return app.test(arg); break;
+                        case "setDate": return app.setDate(arg); break;
+                        case "getLoginStatus": return app.$store.getters.GET_LOGIN_STATUS; break;
+                    }
                 }
             },
             // These two intervals on mounted() and beforeDestroy() ensure that the global timeElapsed is updated regularly - normally, Vue reactively updates fields as
             // needed (and caches the last result), but in the specific case of using Date.now(), Vue can't tell that it changes every time you call it, so we have to manually tell it to update.
             // (as per here: https://medium.com/vuejs-tips/i-want-it-now-ca6c89dded6c and https://cushionapp.com/journal/reactive-time-with-vuejs)
             mounted: function () {
-                this.$options.interval = setInterval(this.updateTimeElapsed, 1000); // We update every second
+                this.$options.timeElapsedInterval = setInterval(this.updateTimeElapsed, 1000); // We update every second (change to every 5? 30? seconds for actual implementation)
+                this.$options.DateTimeInterval = setInterval(this.updateLastActiveDateTime, 5000); // We update every 5 seconds (change to 1 minute for actual implementation)
             },
             beforeDestroy: function () {
-                clearInterval(this.$options.interval);
+                clearInterval(this.$options.timeElapsedInterval);
+                clearInterval(this.$options.DateTimeInterval);
             },
             // Watcher on loginStatus, which is sourced from the global store as a getter. Sends a ping to C# if the login status changes.
             watch: {
                 loginStatus: function (newLoginStatus, oldLoginStatus) {
-                    window.external.WriteInfoToWindows('Login status changed from ' + oldLoginStatus + ' to ' + newLoginStatus);
+                    window.external.WriteInfoToWindows('Login status changed from ' + oldLoginStatus + ' to ' + newLoginStatus); // will be step in token process
                 }
             }
         })
 
+       
     </script>
 </body>
 </html>

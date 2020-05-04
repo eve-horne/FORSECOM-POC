@@ -57,7 +57,7 @@ namespace ForsecomInterops
         /// <param name="e"></param>
         private void Form1_Load(object sender, EventArgs e)
         {
-            objectForScripting = new ObjectForScripting(webBrowser1);
+            objectForScripting = new ObjectForScripting();
             webBrowser1.AllowWebBrowserDrop = false;
             webBrowser1.IsWebBrowserContextMenuEnabled = true;
             webBrowser1.WebBrowserShortcutsEnabled = false;
@@ -77,20 +77,24 @@ namespace ForsecomInterops
         /// <param name="e"></param>
         private void button1_Click(object sender, EventArgs e)
         {
-            Debug.WriteLine(webBrowser1.Document.InvokeScript("test",
-            new String[] { "This is text in C# that has been sent to the web browser and is now being shown with a JS alert!" }));
+            Debug.WriteLine(webBrowser1.Document.InvokeScript("callFunction",
+            new String[] { "test", "This is text in C# that has been sent to the web browser and is now being shown with a JS alert!" }));
         }
 
+        // Sets the last active time to "now". Mimics a onmouseclick or onmouseover event on FormBase.
         private void button2_Click(object sender, EventArgs e)
         {
             lastActive = DateTime.Now;
             label2.Text = lastActive.ToString();
-            this.objectForScripting.UserLastActiveDateTime = lastActive.ToString();
+
+            // This is the important bit:
+            this.objectForScripting.lastActiveDate = lastActive.ToString();
         }
 
+        // Manually retrieve the login status from JS-land
         private void button3_Click(object sender, EventArgs e)
         {
-            label3.Text = "Status: " + (String)webBrowser1.Document.InvokeScript("getLoginStatus");
+            label3.Text = "Status: " + (String)webBrowser1.Document.InvokeScript("callFunction", new String[] { "getLoginStatus" });
 
         }
     }

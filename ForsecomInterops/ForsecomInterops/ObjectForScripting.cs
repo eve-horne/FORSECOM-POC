@@ -6,25 +6,22 @@ namespace ForsecomInterops
     /// <summary>
     /// Singleton object that will be set as Form1's Webbrowser.Objectforscripting.
     /// When we actually use this code as reference, this will probably be called something like "ForseComInterop.cs"
+    /// (Lives where we put the windows form)
     /// </summary>
     [System.Runtime.InteropServices.ComVisible(true)] // This attribute is necessary so that Form1's Webbrowser can "see" this object
-    public class ObjectForScripting
+    public class ObjectForScripting // needs access to FormBase somehow
     {
-        /// <summary>
-        /// Private constructor so nobody can call it but the class itself
-        /// </summary>
-        public ObjectForScripting(WebBrowser browser) {
-           webBrowser = browser;
-        }
 
-        private WebBrowser webBrowser;
-        public String UserLastActiveDateTime
+        public ObjectForScripting() {}
+        internal string lastActiveDate; // this would be in FormBase as a static property
+
+        // This property can be referenced by both the JS-world and the C#-world.
+        // There's a parallel property kept in Vue's Vuex store, which is updated every minute against this property.
+        public string UserLastActiveDateTime
         {
-            get; set;
-        }
-        public string SomeProp
-        {
-            get; set;
+            get {
+                return lastActiveDate;
+            }
         }
 
         /// <summary>
@@ -34,22 +31,18 @@ namespace ForsecomInterops
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        public void SendInfoToWindows(String message)
+        public void SendInfoToWindows(string message)
         {
             MessageBox.Show("This is a Windows alert! The webpage sent me this: " + message, "Windows alert!");
         }
-        public void WriteInfoToWindows(String message)
-        {
-            Console.WriteLine(message);
-        }
 
-        // This whole function isn't strictly necessary, because we just set and retrieve the
-        // object's properties as needed
-        public String requestLastActiveTime()
+        /// <summary>
+        /// Simple test function that JS can call to ping C#
+        /// </summary>
+        /// <param name="message"></param>
+        public void WriteInfoToWindows(string message)
         {
-            // This is no longer necessary, because we can just return the time itself!:
-            // webBrowser.Document.InvokeScript("setDate", new String[] { lastActive.ToString() });
-            return UserLastActiveDateTime;
+            Console.WriteLine(message); //#if debug - applicationlogger.log
         }
     }
 }
