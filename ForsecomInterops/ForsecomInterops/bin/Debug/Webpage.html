@@ -48,7 +48,7 @@
             // Global state store
             state: {
                 lastDate: null,
-                timeElapsed: null
+                timeElapsed: NaN
             },
             // Mutations update the state
             // All-caps is convention for the names of mutations, actions, and getters
@@ -73,8 +73,7 @@
             store: store,
             // Component-specific data
             data: {
-                message: 'If you see me, vue is working!',
-                dateCheck: false, // I wasn't really sure what this flag was for so I left it local
+                message: 'If you see me, vue is working!'
             },
             computed: {
                 // References the lastDate in the global store
@@ -92,15 +91,9 @@
                 // I can't get '...mapState()' (Vue's suggested solution) to work in our setup - maybe need Babel?
             },
             methods: {
-                updateDateCheck: function (status) {
-                    this.dateCheck = status;
-                },
+                // Checks the last date of activity from C#-land
                 checkDate: function () {
-                    window.external.requestLastActiveTime();
-                },
-                // Updates the lastDate value in the global store
-                setDate: function (date) {
-                    this.$store.commit('UPDATE_LAST_DATE', date);
+                    this.$store.commit('UPDATE_LAST_DATE', window.external.UserLastActiveDateTime);
                 },
                 test: function (message) { alert(message); return "This is some return data originating from the JS side of things"; },
                 phoneHome: function () {

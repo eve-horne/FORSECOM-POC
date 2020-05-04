@@ -85,7 +85,7 @@ namespace ForsecomInterops
         {
             lastActive = DateTime.Now;
             label2.Text = lastActive.ToString();
-            this.objectForScripting.lastActive = lastActive;
+            this.objectForScripting.UserLastActiveDateTime = lastActive.ToString();
         }
 
         private void button3_Click(object sender, EventArgs e)

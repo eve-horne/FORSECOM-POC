@@ -18,7 +18,14 @@ namespace ForsecomInterops
         }
 
         private WebBrowser webBrowser;
-        public DateTime lastActive;
+        public String UserLastActiveDateTime
+        {
+            get; set;
+        }
+        public string SomeProp
+        {
+            get; set;
+        }
 
         /// <summary>
         /// This is an example of the webpage pinging functions within C#-side. Here, clicking on a JS button inside of the webpage
@@ -35,9 +42,14 @@ namespace ForsecomInterops
         {
             Console.WriteLine(message);
         }
-        public void requestLastActiveTime()
+
+        // This whole function isn't strictly necessary, because we just set and retrieve the
+        // object's properties as needed
+        public String requestLastActiveTime()
         {
-            webBrowser.Document.InvokeScript("setDate", new String[] { lastActive.ToString() });
+            // This is no longer necessary, because we can just return the time itself!:
+            // webBrowser.Document.InvokeScript("setDate", new String[] { lastActive.ToString() });
+            return UserLastActiveDateTime;
         }
     }
 }
